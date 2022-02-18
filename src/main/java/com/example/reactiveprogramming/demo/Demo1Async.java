@@ -1,12 +1,12 @@
 package com.example.reactiveprogramming.demo;
 
-import reactor.core.publisher.Mono;
+import rx.Observable;
 
 public class Demo1Async {
     // every unit is a node
     public static void main(String[] args) {
-        Mono<String> baker = Mono.just("I am a Baker");
-        Mono<String> waiter = Mono.just("I am a Waiter");
-        Mono<String> client = Mono.just("I am a Client");
+        Observable<String> baker = Observable.just("I am a Baker");
+        Observable<String> waiter = Observable.just("I am a Waiter");
+        Observable<String> client = Observable.just("I am a Client");
     }
 }

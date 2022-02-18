@@ -1,8 +1,10 @@
 package com.example.reactiveprogramming.demo;
 
-import reactor.core.publisher.Flux;
+
+import rx.Observable;
 
 import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 
 public class Demo2Backpressure {
     // batching emitted items
@@ -10,17 +12,16 @@ public class Demo2Backpressure {
 
     // subscriber side: request, cancel.
     public static void demoBackpressureBuffer() {
-        Flux<Long> x = Flux.interval(Duration.ofSeconds(1));
+        Observable<Long> x = Observable.interval(1, TimeUnit.SECONDS);
         x.onBackpressureBuffer().subscribe(System.out::println);
     }
 
     public static void demoBackpressureDrop() {
-        Flux<Long> x = Flux.interval(Duration.ofSeconds(1));
+        Observable<Long> x = Observable.interval(1, TimeUnit.SECONDS);
         x.onBackpressureDrop().subscribe(System.out::println);
     }
     public static void main(String[] args) {
-        Flux<String> x = Flux.just("a", "b", "c");
-        x.onBackpressureError();
+        Observable<String> x = Observable.just("a", "b", "c");
         //
         x.onBackpressureLatest();
     }

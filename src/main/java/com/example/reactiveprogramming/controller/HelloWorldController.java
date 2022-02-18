@@ -18,6 +18,12 @@ public class HelloWorldController {
     @GetMapping("/blocking")
     public List<Integer> getBlockingData() {
         List<Integer> data = IntStream.range(1, 10)
+                // mimic a DB call time-consuming task
+                .map(i -> {
+                    sleep(1000);
+                    return i;
+                })
+                // mimic an external call time-consuming task
                 .map(i -> {
                     sleep(1000);
                     return i;
