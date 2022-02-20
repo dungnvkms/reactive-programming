@@ -4,7 +4,9 @@ import rx.Observable;
 import rx.Scheduler;
 import rx.schedulers.Schedulers;
 
-public class DemoSchedulers {
+import java.util.stream.Stream;
+
+public class Demo6Schedulers {
 
     public static void myPublishSchedulers(Scheduler scheduler) {
         Observable.range(0, 2)
@@ -34,16 +36,12 @@ public class DemoSchedulers {
     }
 
     public static void mySubscribersSchedulers(Scheduler scheduler) throws InterruptedException {
-        // xem lại chỗ này chưa chạy
-        Observable.just("a", "b", "c") //this is where subscription triggers data production
-                //this is influenced by subscribeOn
+        Observable.just("a", "b", "c")
                 .doOnNext(v -> System.out.println("before observeOn: " + Thread.currentThread().getName()))
                 .observeOn(Schedulers.immediate())
-                //the rest is influenced by observeOn
                 .doOnNext(v -> System.out.println("after observeOn: " + Thread.currentThread().getName()))
                 .subscribeOn(Schedulers.computation())
                 .subscribe(v -> System.out.println("received " + v + " on " + Thread.currentThread().getName()));
-        Thread.sleep(5000);
     }
 
     public static void main(String[] args) throws InterruptedException {
@@ -55,23 +53,7 @@ public class DemoSchedulers {
 //        myPublishMultipleSchedulers();
 //        mySubscribersSchedulers(Schedulers.single());
 
+        Thread.sleep(5000);
 
-        Observable.range(0, 10)
-                .map(i -> {
-                    System.out.println("Mapping for " + i + " is done by thread " + Thread.currentThread().getName());
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    return i;
-                })
-                .doOnNext(v -> System.out.println("before observeOn: " + Thread.currentThread().getName()))
-                .observeOn(Schedulers.io())
-                //the rest is influenced by observeOn
-                .doOnNext(v -> System.out.println("after observeOn: " + Thread.currentThread().getName()))
-                .subscribeOn(Schedulers.immediate())
-                .subscribe();
-        Thread.sleep(2000);
     }
 }

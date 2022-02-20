@@ -2,7 +2,10 @@ package com.example.reactiveprogramming.demo;
 
 import rx.Observable;
 
-public class Demo3ErrorHandling {
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+
+public class Demo4ErrorHandling {
 
     public static void exceptionExample() {
         Observable<String> people = Observable.just("A", "B", "C")
@@ -36,7 +39,15 @@ public class Demo3ErrorHandling {
                 .subscribe(System.out::println);
     }
 
-    public static void main(String[] args) {
-        exceptionHandleError();
+    public static void exceptionRetry() {
+        Observable<String> people = Observable.just("A", "B", "C")
+                .concatWith(Observable.error(new RuntimeException("this is an error")))
+                .concatWith(Observable.just("D", "E", "F"));
+        people.retryWhen(observable -> observable.take(10).delay(2, TimeUnit.SECONDS))
+                .subscribe(System.out::println);
+    }
+
+    public static void main(String[] args) throws IOException {
+        exceptionRetry();
     }
 }

@@ -3,9 +3,22 @@ package com.example.reactiveprogramming.demo;
 import rx.Observable;
 import rx.observables.ConnectableObservable;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class DemoPubSub {
+public class Demo0PubSub {
+
+    public static void demo() {
+        String allAlphabets = "the quick brown fox jumps over the lazy dog";
+        // assume this is an async data event list returned from API
+        List<String> words = Arrays.asList(allAlphabets.split(" "));
+
+        // and then we apply all these operators for each async event
+        Observable.from(words)
+                .distinct()
+                .subscribe(System.out::println);
+    }
 
     public static void coldPublishers() throws InterruptedException {
         // Start a cold Publisher which emits 0,1,2 every sec.
