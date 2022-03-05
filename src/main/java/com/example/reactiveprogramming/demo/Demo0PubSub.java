@@ -24,10 +24,10 @@ public class Demo0PubSub {
         // Start a cold Publisher which emits 0,1,2 every sec.
         Observable<Long> flux =  Observable.interval(1, TimeUnit.SECONDS);
         // Let's subscribe to that with multiple subscribers.
-        flux.subscribe(i -> System.out.println("first_subscriber received value:" + i));
+        flux.subscribe(i -> System.out.println("first_subscriber:" + i + " on Thread: " + Thread.currentThread().getName()));
         Thread.sleep(3000);
         // Let a second subscriber come after some time 3 secs here.
-        flux.subscribe(i -> System.out.println("second_subscriber received value:" + i));
+        flux.subscribe(i -> System.out.println("second_subscriber:" + i + " on Thread: " + Thread.currentThread().getName()));
     }
 
     public static void hotPublishers() throws InterruptedException {
@@ -61,6 +61,6 @@ public class Demo0PubSub {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        publisherOnSeparateThread();
+        coldPublishers();
     }
 }
