@@ -59,12 +59,12 @@ public class Demo4ErrorHandling {
     public static void exceptionVsError() {
         Observable<String> exception = Observable.<String>error(new IOException())
                 .onExceptionResumeNext(Observable.just("This value will be used to recover from the IOException"));
-
-        Observable<String> data = Observable.just("A", "B");
+        Observable<String> data1 = Observable.just("A", "B");
         Observable<String> error = Observable.<String>error(new Error())
                 .onExceptionResumeNext(Observable.just("This value will not be used"));
+        Observable<String> data2 = Observable.just("C", "D");
 
-        Observable.concat(exception, data, error)
+        Observable.concat(exception, data1, error, data2)
                 .subscribe(
                         message -> System.out.println("onNext: " + message),
                         err -> System.err.println("onError: " + err));
