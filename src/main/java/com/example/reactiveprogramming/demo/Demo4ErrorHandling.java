@@ -10,14 +10,14 @@ public class Demo4ErrorHandling {
 
     public static void exceptionExample() {
         Observable<String> people = Observable.just("A", "B", "C")
-                .concatWith(Observable.error(new RuntimeException("this is an error")))
+                .concatWith(Observable.error(new RuntimeException("this is an exception")))
                 .concatWith(Observable.just("D", "E", "F"));
         people.subscribe(System.out::println);
     }
 
     public static void exceptionDownStreamHandling() {
         Observable<String> people = Observable.just("A", "B", "C")
-                .concatWith(Observable.error(new RuntimeException("this is an error")))
+                .concatWith(Observable.error(new RuntimeException("this is an exception")))
                 .concatWith(Observable.just("D", "E", "F"));
         people.subscribe(System.out::println, throwable -> System.out.println(throwable.getMessage()));
     }
@@ -31,14 +31,14 @@ public class Demo4ErrorHandling {
 
     public static void exceptionHandleError() {
         Observable.just("A", "B", "C")
-                .concatWith(Observable.error(new RuntimeException("this is an error")))
+                .concatWith(Observable.error(new RuntimeException("this is an exception")))
                 .onErrorReturn(throwable -> "new value")
                 .subscribe(System.out::println);
     }
 
     public static void exceptionCallABackup() {
         Observable<String> people = Observable.just("A", "B", "C")
-                .concatWith(Observable.error(new RuntimeException("this is an error")))
+                .concatWith(Observable.error(new OutOfMemoryError("this is an error")))
                 .concatWith(Observable.just("D", "E", "F"));
         people.onErrorResumeNext(throwable -> {
                     System.out.println("switch to backup server");
@@ -56,9 +56,23 @@ public class Demo4ErrorHandling {
                 .subscribe(System.out::println);
     }
 
-    public static void main(String[] args) throws IOException, InterruptedException {
-        exceptionUpperStreamHandling();
+    public static void exceptionVsError() {
+        Observable<String> exception = Observable.<String>error(new IOException())
+                .onExceptionResumeNext(Observable.just("This value will be used to recover from the IOException"));
 
-        Thread.sleep(30000);
+        Observable<String> data = Observable.just("A", "B");
+        Observable<String> error = Observable.<String>error(new Error())
+                .onExceptionResumeNext(Observable.just("This value will not be used"));
+
+        Observable.concat(exception, data, error)
+                .subscribe(
+                        message -> System.out.println("onNext: " + message),
+                        err -> System.err.println("onError: " + err));
+    }
+
+    public static void main(String[] args) throws IOException, InterruptedException {
+        exceptionVsError();
+
+        Thread.sleep(3000);
     }
 }
