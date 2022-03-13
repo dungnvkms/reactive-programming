@@ -11,7 +11,7 @@ public class Demo2Unsubscribe {
         observable.subscribe(new Subscriber<Integer>() {
             @Override
             public void onStart() {
-                request(2);
+//                request(2);
             }
 
             @Override

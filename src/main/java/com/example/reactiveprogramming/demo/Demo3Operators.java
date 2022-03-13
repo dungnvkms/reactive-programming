@@ -11,6 +11,7 @@ public class Demo3Operators {
         List<String> words = Arrays.asList(allAlphabets.split(" "));
 
         Observable.from(words)
+                .filter(item -> item.equals("the"))
                 .flatMap(word -> Observable.from(word.split("")))
                 .distinct()
                 .zipWith(Observable.range(1,50), (letter, line) -> line + " " + letter)

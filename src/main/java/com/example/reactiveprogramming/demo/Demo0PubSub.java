@@ -22,23 +22,21 @@ public class Demo0PubSub {
 
     public static void coldPublishers() throws InterruptedException {
         // Start a cold Publisher which emits 0,1,2 every sec.
-        Observable<Long> flux =  Observable.interval(1, TimeUnit.SECONDS);
-        // Let's subscribe to that with multiple subscribers.
-        flux.subscribe(i -> System.out.println("first_subscriber:" + i + " on Thread: " + Thread.currentThread().getName()));
+        Observable<Long> observable =  Observable.interval(1, TimeUnit.SECONDS);
+        observable.subscribe(i -> System.out.println("first_subscriber:" + i + " on Thread: " + Thread.currentThread().getName()));
         Thread.sleep(3000);
-        // Let a second subscriber come after some time 3 secs here.
-        flux.subscribe(i -> System.out.println("second_subscriber:" + i + " on Thread: " + Thread.currentThread().getName()));
+        observable.subscribe(i -> System.out.println("second_subscriber:" + i + " on Thread: " + Thread.currentThread().getName()));
     }
 
     public static void hotPublishers() throws InterruptedException {
         // Start a cold Publisher which emits 0,1,2 every sec.
-        Observable<Long> flux =  Observable.interval(1, TimeUnit.SECONDS);
+        Observable<Long> observable =  Observable.interval(1, TimeUnit.SECONDS);
         // Make the Publisher Hot
-        ConnectableObservable<Long> connectableObservable = flux.publish();
+        ConnectableObservable<Long> connectableObservable = observable.publish();
         // Now that we have a handle on the hot Publisher
         // Let's subscribe to that with multiple subscribers.
         connectableObservable.subscribe(i -> System.out.println("first_subscriber received value:" + i));
-        // Start firing events with .connect() on the published flux.
+        // Start firing events with .connect() on the published observable.
         connectableObservable.connect();
         Thread.sleep(5000);
         // Let a second subscriber come after some time 3 secs here.

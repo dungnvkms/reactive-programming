@@ -4,7 +4,9 @@ import rx.Observable;
 import rx.Scheduler;
 import rx.schedulers.Schedulers;
 
-import java.util.stream.Stream;
+import static com.example.reactiveprogramming.demo.helper.Color.ANSI_BLUE;
+import static com.example.reactiveprogramming.demo.helper.Color.ANSI_GREEN;
+import static com.example.reactiveprogramming.demo.helper.Color.ANSI_YELLOW;
 
 public class Demo6Schedulers {
 
@@ -20,28 +22,28 @@ public class Demo6Schedulers {
     public static void myPublishMultipleSchedulers() {
         Observable.range(0, 2)
                 .map(i -> {
-                    System.out.println("Mapping one for " + i + " is done by thread " + Thread.currentThread().getName());
+                    System.out.println(ANSI_BLUE + "Mapping one for " + i + " is done by thread " + Thread.currentThread().getName());
                     return i;
                 })
-                .observeOn(Schedulers.immediate())
+                .observeOn(Schedulers.computation())
                 .map(i -> {
-                    System.out.println("Mapping two for " + i + " is done by thread " + Thread.currentThread().getName());
+                    System.out.println(ANSI_YELLOW + "Mapping two for " + i + " is done by thread " + Thread.currentThread().getName());
                     return i;
                 })
                 .observeOn(Schedulers.io())
                 .map(i -> {
-                    System.out.println("Mapping three for " + i + " is done by thread " + Thread.currentThread().getName());
+                    System.out.println(ANSI_GREEN + "Mapping three for " + i + " is done by thread " + Thread.currentThread().getName());
                     return i;
                 }).subscribe();
     }
 
-    public static void mySubscribersSchedulers(Scheduler scheduler) throws InterruptedException {
+    public static void mySubscribersSchedulers() throws InterruptedException {
         Observable.just("a", "b", "c")
-                .doOnNext(v -> System.out.println("before observeOn: " + Thread.currentThread().getName()))
-                .observeOn(Schedulers.immediate())
-                .doOnNext(v -> System.out.println("after observeOn: " + Thread.currentThread().getName()))
+                .doOnNext(v -> System.out.println(ANSI_BLUE + "before observeOn: " + Thread.currentThread().getName()))
+                .observeOn(Schedulers.io())
+                .doOnNext(v -> System.out.println(ANSI_YELLOW + "after observeOn: " + Thread.currentThread().getName()))
                 .subscribeOn(Schedulers.computation())
-                .subscribe(v -> System.out.println("received " + v + " on " + Thread.currentThread().getName()));
+                .subscribe(v -> System.out.println(ANSI_YELLOW + "received " + v + " on " + Thread.currentThread().getName()));
     }
 
     public static void main(String[] args) throws InterruptedException {
@@ -52,6 +54,8 @@ public class Demo6Schedulers {
 //        myPublishSchedulers(Schedulers.parallel());
 //        myPublishMultipleSchedulers();
 //        mySubscribersSchedulers(Schedulers.single());
+
+        myPublishMultipleSchedulers();
 
         Thread.sleep(5000);
 

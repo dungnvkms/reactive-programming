@@ -1,6 +1,7 @@
 package com.example.reactiveprogramming.demo;
 
 import rx.Observable;
+import rx.Subscriber;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -19,6 +20,13 @@ public class Demo4ErrorHandling {
                 .concatWith(Observable.error(new RuntimeException("this is an error")))
                 .concatWith(Observable.just("D", "E", "F"));
         people.subscribe(System.out::println, throwable -> System.out.println(throwable.getMessage()));
+    }
+
+    public static void exceptionUpperStreamHandling() {
+        Observable.just("A", "B", "C")
+                .concatWith(Observable.error(new RuntimeException("this is an error")))
+                .doOnError(throwable -> System.out.println("logged by server"))
+                .subscribe(System.out::println);
     }
 
     public static void exceptionHandleError() {
@@ -40,6 +48,7 @@ public class Demo4ErrorHandling {
     }
 
     public static void exceptionRetry() {
+        // resubscribe if there are errors
         Observable<String> people = Observable.just("A", "B", "C")
                 .concatWith(Observable.error(new RuntimeException("this is an error")))
                 .concatWith(Observable.just("D", "E", "F"));
@@ -47,7 +56,9 @@ public class Demo4ErrorHandling {
                 .subscribe(System.out::println);
     }
 
-    public static void main(String[] args) throws IOException {
-        exceptionRetry();
+    public static void main(String[] args) throws IOException, InterruptedException {
+        exceptionUpperStreamHandling();
+
+        Thread.sleep(30000);
     }
 }
