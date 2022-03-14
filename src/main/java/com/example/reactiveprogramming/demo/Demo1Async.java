@@ -1,15 +1,13 @@
 package com.example.reactiveprogramming.demo;
 
-import rx.Observable;
+import com.example.reactiveprogramming.demo.helper.CommonUtils;
+import io.reactivex.rxjava3.core.Observable;
 
-import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
 public class Demo1Async {
 
@@ -17,7 +15,6 @@ public class Demo1Async {
 
     public static Future<Integer> getUserId(Integer input) {
         return executor.submit(() -> {
-            System.out.println("dvnguyen11111111");
             if (input == 10) throw new Exception("Can't handle");
             return input;
         });
@@ -65,14 +62,15 @@ public class Demo1Async {
     }
 
     public static void runWithReactive(Integer userInput) {
-        Observable.from(getUserId(userInput))
-                .flatMap(id -> Observable.from(getUserInfo(id)))
+        Observable.fromFuture(getUserId(userInput))
+                .flatMap(id -> Observable.fromFuture(getUserInfo(id)))
                 .subscribe(System.out::println, throwable -> System.out.println(throwable.getMessage()));
     }
 
     public static void main(String[] args) throws ExecutionException, InterruptedException {
-        runWithCompletableFuture().thenRun(() -> System.out.println("this is an async"));
+        runWithReactive(10);
+//        runWithCompletableFuture().thenRun(() -> System.out.println("this is an async"));
         executor.shutdown();
-        Thread.sleep(10000);
+        CommonUtils.sleep(10000);
     }
 }

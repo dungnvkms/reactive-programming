@@ -1,89 +1,62 @@
 package com.example.reactiveprogramming.demo;
 
-import rx.BackpressureOverflow;
-import rx.Observable;
-import rx.Subscriber;
-import rx.schedulers.Schedulers;
-
-import java.util.List;
+import com.example.reactiveprogramming.demo.helper.CommonUtils;
+import io.reactivex.rxjava3.core.BackpressureOverflowStrategy;
+import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
 import java.util.concurrent.TimeUnit;
 
 public class Demo5Backpressure {
 
     public static void demoBackpressureSkippingItems() {
-        Observable<Integer> observable = Observable.just(1, 2, 3, 4, 5, 6);
-        observable.skip(2).subscribe(new Subscriber<Integer>() {
-            @Override
-            public void onCompleted() {}
-
-            @Override
-            public void onError(Throwable e) {}
-
-            @Override
-            public void onNext(Integer value) {
-                System.out.println(value);
-            }
-        });
+        Flowable<Integer> flowable = Flowable.just(1, 2, 3, 4, 5, 6);
+        flowable.skip(2).subscribe(System.out::println);
     }
 
     public static void demoBackpressureBatchingEmittedItems() {
-        Observable<Integer> observable = Observable.just(1, 2, 3, 4, 5, 6);
-        observable.buffer(4).subscribe(new Subscriber<List<Integer>>() {
-            @Override
-            public void onCompleted() {}
-
-            @Override
-            public void onError(Throwable e) {}
-
-            @Override
-            public void onNext(List<Integer> value) {
-                System.out.println(value);
-            }
-        });
+        Flowable<Integer> flowable = Flowable.just(1, 2, 3, 4, 5, 6);
+        flowable.buffer(4).subscribe(System.out::println);
     }
 
     public static void demoBackpressureRequest() {
-        Observable<Integer> observable = Observable.just(1, 2, 3, 4, 5, 6);
-        observable.subscribe(new Subscriber<Integer>() {
+        Flowable<Integer> flowable = Flowable.just(1, 2, 3, 4, 5, 6);
+        flowable.subscribe(new Subscriber<Integer>() {
+            private Subscription subscription;
             @Override
-            public void onCompleted() {}
-
-            @Override
-            public void onError(Throwable e) {}
-
-            @Override
-            public void onNext(Integer value) {
-                if (value == 2) unsubscribe();
-                System.out.println(value);
+            public void onSubscribe(Subscription s) {
+                this.subscription = s;
+                this.subscription.request(1);
             }
-        });
-    }
-
-    public static void demoBackpressureUnsubscribe() {
-        Observable<Integer> observable = Observable.just(1, 2, 3, 4, 5, 6);
-        observable.subscribe(new Subscriber<Integer>() {
-            @Override
-            public void onCompleted() {}
 
             @Override
             public void onError(Throwable e) {}
 
             @Override
+            public void onComplete() {
+
+            }
+
+            @Override
             public void onNext(Integer value) {
                 System.out.println(value);
-                if (value == 2) unsubscribe();
+                this.subscription.request(1);
+                if (value == 2) this.subscription.cancel();
             }
         });
     }
 
     public static void demoBackpressureBuffer() {
-        Observable<Long> observable = Observable.interval(1, TimeUnit.MILLISECONDS);
-        observable.onBackpressureBuffer(10, () -> {}, BackpressureOverflow.ON_OVERFLOW_DROP_LATEST)
+        Flowable<Long> flowable = Flowable.interval(1, TimeUnit.MILLISECONDS);
+        flowable.onBackpressureBuffer(1, () -> {}, BackpressureOverflowStrategy.DROP_LATEST)
                 .observeOn(Schedulers.newThread())
                 .subscribe(new Subscriber<Long>() {
+                    private Subscription subscription;
                     @Override
-                    public void onCompleted() {
-                        System.out.println("onCompleted.");
+                    public void onSubscribe(Subscription s) {
+                        this.subscription = s;
+                        this.subscription.request(1);
                     }
 
                     @Override
@@ -92,22 +65,29 @@ public class Demo5Backpressure {
                     }
 
                     @Override
+                    public void onComplete() {
+
+                    }
+
+                    @Override
                     public void onNext(Long aLong) {
                         System.out.println("onNext: " + aLong);
-                        sleep(100);
+                        this.subscription.request(1);
+                        CommonUtils.sleep(100);
                     }
                 });
-        sleep(1000000);
     }
 
     public static void demoBackpressureDrop() {
-        Observable<Long> observable = Observable.interval(1, TimeUnit.MILLISECONDS);
-        observable.onBackpressureDrop(v -> System.out.println("Dropped.. :" + v))
+        Flowable<Long> flowable = Flowable.interval(1, TimeUnit.MILLISECONDS);
+        flowable.onBackpressureDrop(v -> System.out.println("Dropped.. :" + v))
                 .observeOn(Schedulers.newThread())
                 .subscribe(new Subscriber<Long>() {
+                    private Subscription subscription;
                     @Override
-                    public void onCompleted() {
-                        System.out.println("onCompleted.");
+                    public void onSubscribe(Subscription s) {
+                        this.subscription = s;
+                        this.subscription.request(1);
                     }
 
                     @Override
@@ -116,23 +96,22 @@ public class Demo5Backpressure {
                     }
 
                     @Override
+                    public void onComplete() {
+
+                    }
+
+                    @Override
                     public void onNext(Long aLong) {
                         System.out.println("onNext: " + aLong);
-                        sleep(100);
+                        this.subscription.request(1);
+                        CommonUtils.sleep(100);
                     }
                 });
-        sleep(1000000);
     }
 
 
-    public static void sleep(int ms) {
-        try {
-            Thread.sleep(ms);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
     public static void main(String[] args) {
-        demoBackpressureSkippingItems();
+        demoBackpressureBuffer();
+        CommonUtils.sleep(1000000);
     }
 }

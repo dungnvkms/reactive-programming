@@ -1,8 +1,8 @@
 package com.example.reactiveprogramming.demo;
 
-import rx.Observable;
-import rx.Scheduler;
-import rx.schedulers.Schedulers;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Scheduler;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 import static com.example.reactiveprogramming.demo.helper.Color.ANSI_BLUE;
 import static com.example.reactiveprogramming.demo.helper.Color.ANSI_GREEN;

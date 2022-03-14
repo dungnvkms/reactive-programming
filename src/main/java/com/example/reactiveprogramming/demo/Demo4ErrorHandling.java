@@ -1,7 +1,7 @@
 package com.example.reactiveprogramming.demo;
 
-import rx.Observable;
-import rx.Subscriber;
+import com.example.reactiveprogramming.demo.helper.CommonUtils;
+import io.reactivex.rxjava3.core.Observable;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -52,27 +52,27 @@ public class Demo4ErrorHandling {
         Observable<String> people = Observable.just("A", "B", "C")
                 .concatWith(Observable.error(new RuntimeException("this is an error")))
                 .concatWith(Observable.just("D", "E", "F"));
-        people.retryWhen(observable -> observable.take(10).delay(2, TimeUnit.SECONDS))
+        people.retryWhen(observable -> observable.take(10).delay(5, TimeUnit.SECONDS))
                 .subscribe(System.out::println);
     }
 
-    public static void exceptionVsError() {
+    public static void exceptionComplete() {
         Observable<String> exception = Observable.<String>error(new IOException())
-                .onExceptionResumeNext(Observable.just("This value will be used to recover from the IOException"));
+                .onErrorResumeNext(throwable -> Observable.just("This value will be used to recover from the IOException"));
         Observable<String> data1 = Observable.just("A", "B");
-        Observable<String> error = Observable.<String>error(new Error())
-                .onExceptionResumeNext(Observable.just("This value will not be used"));
+        Observable<String> error = Observable.<String>error(new Error());
         Observable<String> data2 = Observable.just("C", "D");
 
         Observable.concat(exception, data1, error, data2)
+                .onErrorComplete()
                 .subscribe(
                         message -> System.out.println("onNext: " + message),
                         err -> System.err.println("onError: " + err));
     }
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        exceptionVsError();
+        exceptionComplete();
 
-        Thread.sleep(3000);
+        CommonUtils.sleep(20000);
     }
 }
