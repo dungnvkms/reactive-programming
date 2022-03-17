@@ -1,5 +1,6 @@
 package com.example.reactiveprogramming.demo;
 
+import com.example.reactiveprogramming.demo.helper.CommonUtils;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Scheduler;
 import io.reactivex.rxjava3.schedulers.Schedulers;
@@ -44,6 +45,17 @@ public class Demo6Schedulers {
                 .doOnNext(v -> System.out.println(ANSI_YELLOW + "after observeOn: " + Thread.currentThread().getName()))
                 .subscribeOn(Schedulers.computation())
                 .subscribe(v -> System.out.println(ANSI_YELLOW + "received " + v + " on " + Thread.currentThread().getName()));
+    }
+
+    public static void runWithAsync() {
+        Observable.just("A", "B", "C")
+                .subscribeOn(Schedulers.newThread())
+                .subscribe(item -> {
+                    System.out.println(item);
+                    CommonUtils.sleep(1000);
+                });
+        System.out.println("Finished");
+        CommonUtils.sleep(4000);
     }
 
     public static void main(String[] args) throws InterruptedException {
