@@ -2,8 +2,10 @@ package com.example.reactiveprogramming;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableAsync;
 import reactor.core.publisher.Flux;
 
+@EnableAsync
 @SpringBootApplication
 public class ReactiveProgrammingApplication {
 
